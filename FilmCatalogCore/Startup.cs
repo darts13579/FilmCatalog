@@ -33,7 +33,7 @@ namespace FilmCatalogCore
                     options.Password.RequireNonAlphanumeric = false;
                 })
                 .AddEntityFrameworkStores<ApplicationDbContext>();
-            services.AddControllersWithViews();
+            services.AddControllersWithViews().AddRazorRuntimeCompilation();
             services.AddRazorPages();
 
             services.AddScoped<IFilmService, FilmService>();
