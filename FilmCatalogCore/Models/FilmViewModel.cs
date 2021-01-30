@@ -1,8 +1,9 @@
-﻿using FilmCatalogCore.Data.Base;
+﻿using System.Diagnostics.CodeAnalysis;
+using FilmCatalogCore.Data.Entities;
 
-namespace FilmCatalogCore.Data.Entities
+namespace FilmCatalogCore.Models
 {
-    public class Film : EntityBaseWithUser
+    public class FilmViewModel
     {
         public string Name { get; set; }
 
@@ -14,6 +15,8 @@ namespace FilmCatalogCore.Data.Entities
 
         public int PosterId { get; set; }
 
+        [NotNull]
+        [SuppressMessage("ReSharper", "VirtualMemberNeverOverridden.Global", Justification = "EF Lazy Loading")]
         public virtual Poster Poster { get; set; }
     }
 }
