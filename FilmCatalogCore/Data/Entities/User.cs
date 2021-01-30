@@ -4,6 +4,5 @@ namespace FilmCatalogCore.Data.Entities
 {
     public class User : IdentityUser
     {
-        
     }
 }

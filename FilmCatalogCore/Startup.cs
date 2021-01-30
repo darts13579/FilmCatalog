@@ -23,11 +23,14 @@ namespace FilmCatalogCore
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<ApplicationDbContext>(options =>
+            {
+                options.UseLazyLoadingProxies();
                 options.UseSqlite(
-                    Configuration.GetConnectionString("DefaultConnection")));
+                    Configuration.GetConnectionString("DefaultConnection"));
+            });
             services.AddDefaultIdentity<User>(options =>
                 {
-                    options.SignIn.RequireConfirmedAccount = true;
+                    options.SignIn.RequireConfirmedAccount = false;
                     options.Password.RequiredUniqueChars = 0;
                     options.Password.RequireUppercase = false;
                     options.Password.RequireNonAlphanumeric = false;

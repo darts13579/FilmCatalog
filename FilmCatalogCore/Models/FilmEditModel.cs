@@ -1,9 +1,6 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using FilmCatalogCore.Data.Entities;
-
-namespace FilmCatalogCore.Models
+﻿namespace FilmCatalogCore.Models
 {
-    public class FilmViewModel
+    public class FilmEditModel
     {
         public int Id { get; set; }
         
