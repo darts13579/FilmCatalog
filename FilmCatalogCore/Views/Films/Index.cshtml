@@ -10,29 +10,35 @@
     <a asp-action="Create">Create New</a>
 </p>
 
-<div class="album py-5 bg-light">
-    <div class="container">
-        @{
-            foreach (var film in Model)
-            {
-                <div class="card shadow-sm">
-                    <img src="" alt="" class="bd-placeholder-img card-img-top" width="100%" height="225" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Thumbnail"/>
-               
-                    <div class="card-body">
-                        <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div class="btn-group">
-                                <button type="button" class="btn btn-sm btn-outline-secondary">View</button>
-                                <button type="button" class="btn btn-sm btn-outline-secondary">Edit</button>
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 align-content-between g-3">
+            @{
+                foreach (var film in Model)
+                {
+                    <div class="col-3 card shadow-sm mx-1 my-1">
+                        <img src="@film.Poster.Path" alt="@film.Name" class="bd-placeholder-img card-img-top p-1" width="100%" height="225" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Thumbnail"/>
+
+                        <div class="card-body">
+                            <a asp-action="Details" asp-route-id="@film.Id" class="btn-link h3">@film.Name</a>
+                            <p>Автор: @film.Producer</p>
+                            <p class="card-text ">
+                                @*TODO: Move to logic*@
+                                @{
+                                    var filmDescription = film.Description;
+                                    if (filmDescription.Length > 40)
+                                    {
+                                        filmDescription = filmDescription.Substring(0, 40) + "...";
+                                    }
+                                }
+                                @filmDescription
+                            </p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted">Год выпуска: @film.Year.ToString()</small>
                             </div>
-                            <small class="text-muted">9 mins</small>
                         </div>
                     </div>
-                </div>
+                }
             }
-        }
-    </div>
-</div>
+        </div>
 
 <table class="table">
     <thead>

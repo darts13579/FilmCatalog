@@ -62,8 +62,7 @@ namespace FilmCatalogCore.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Name,Description,Producer,Year,Id")]
-            FilmCreateModel film)
+        public async Task<IActionResult> Create(FilmCreateModel film)
         {
             if (ModelState.IsValid && User.Identity.IsAuthenticated)
             {

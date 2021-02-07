@@ -27,7 +27,7 @@ namespace FilmCatalogCore.Services.Posters
             {
                 var id = Guid.NewGuid();
             
-                var path = "/Files/" + id;
+                var path = "/Files/" + id + file.ContentType.Replace("image/", ".");
             
                 await using (var fileStream = new FileStream(_appEnvironment.WebRootPath + path, FileMode.Create))
                 {
