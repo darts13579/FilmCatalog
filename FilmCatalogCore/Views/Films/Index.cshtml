@@ -1,97 +1,42 @@
-﻿@model IEnumerable<FilmCatalogCore.Data.Entities.Film>
+﻿@model IEnumerable<FilmViewModel>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Фильмы";
 }
 
-<h1>Index</h1>
+<h1>@ViewData["Title"]</h1>
 
 <p>
     <a asp-action="Create">Create New</a>
 </p>
 
-        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 align-content-between g-3">
-            @{
-                foreach (var film in Model)
-                {
-                    <div class="col-3 card shadow-sm mx-1 my-1">
-                        <img src="@film.Poster.Path" alt="@film.Name" class="bd-placeholder-img card-img-top p-1" width="100%" height="225" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Thumbnail"/>
+<div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 align-content-between g-3">
+    @{
+        foreach (var film in Model)
+        {
+            <div class="col-3 card shadow-sm mx-1 my-1">
+                <img src="@film.PosterUrl" alt="@film.Name" class="bd-placeholder-img card-img-top p-1" width="100%" height="225" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Thumbnail"/>
 
-                        <div class="card-body">
-                            <a asp-action="Details" asp-route-id="@film.Id" class="btn-link h3">@film.Name</a>
-                            <p>Автор: @film.Producer</p>
-                            <p class="card-text ">
-                                @*TODO: Move to logic*@
-                                @{
-                                    var filmDescription = film.Description;
-                                    if (filmDescription.Length > 40)
-                                    {
-                                        filmDescription = filmDescription.Substring(0, 40) + "...";
-                                    }
-                                }
-                                @filmDescription
-                            </p>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <small class="text-muted">Год выпуска: @film.Year.ToString()</small>
-                            </div>
-                        </div>
+                <div class="card-body">
+                    <a asp-action="Details" asp-route-id="@film.Id" class="btn-link h3">@film.Name</a>
+                    <p>Режиссёр: @film.Producer</p>
+                    <p class="card-text ">
+                        @*TODO: Move to logic*@
+                        @{
+                            var filmDescription = film.Description;
+                            if (filmDescription.Length > 40)
+                            {
+                                filmDescription = filmDescription.Substring(0, 40) + "...";
+                            }
+                        }
+                        @filmDescription
+                    </p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <small class="text-muted">Добавил на сайт: @film.Author</small>
+                        <small class="text-muted">Год выпуска: @film.Year.ToString()</small>
                     </div>
-                }
-            }
-        </div>
-
-<table class="table">
-    <thead>
-    <tr>
-        <th>
-            @Html.DisplayNameFor(model => model.Name)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.Description)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.Producer)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.Year)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.Poster)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.User)
-        </th>
-        <th></th>
-    </tr>
-    </thead>
-    <tbody>
-    @foreach (var item in Model)
-    {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Description)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Producer)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Year)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Poster.Id)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.User.Id)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
+                </div>
+            </div>
+        }
     }
-    </tbody>
-</table>
+</div>

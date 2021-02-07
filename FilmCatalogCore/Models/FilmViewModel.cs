@@ -16,5 +16,7 @@ namespace FilmCatalogCore.Models
         public int Year { get; set; }
 
         public string PosterUrl { get; set; }
+
+        public string Author { get; set; }
     }
 }

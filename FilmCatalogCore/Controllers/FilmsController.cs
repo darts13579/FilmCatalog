@@ -16,6 +16,7 @@ namespace FilmCatalogCore.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly IFilmService _filmService;
+        private string UserName => User.Identity.IsAuthenticated ?  User.Identity.Name : null;
 
         public FilmsController(ApplicationDbContext context, IFilmService filmService)
         {
@@ -27,28 +28,27 @@ namespace FilmCatalogCore.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Films.Include(f => f.Poster).Include(f => f.User);
-            return View(await applicationDbContext.ToListAsync());
+            var films = await _filmService.GetFilmList();
+            
+            //var applicationDbContext = _context.Films.Include(f => f.Poster).Include(f => f.User);
+            return View(films);
         }
 
         // GET: Films/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null)
+            if (id != null && UserName != null)
             {
-                return NotFound();
+                var film = await _filmService.GetById((int) id, UserName);
+                if (film == null)
+                {
+                    return NotFound();
+                }
+
+                return View(film);
             }
 
-            var film = await _context.Films
-                .Include(f => f.Poster)
-                .Include(f => f.User)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (film == null)
-            {
-                return NotFound();
-            }
-
-            return View(film);
+            return NotFound();
         }
 
         // GET: Films/Create
@@ -64,7 +64,7 @@ namespace FilmCatalogCore.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(FilmCreateModel film)
         {
-            if (ModelState.IsValid && User.Identity.IsAuthenticated)
+            if (ModelState.IsValid && UserName != null)
             {
                 var userName = User.Identity.Name;
 

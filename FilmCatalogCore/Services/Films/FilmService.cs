@@ -36,15 +36,28 @@ namespace FilmCatalogCore.Services.Films
                 Description = _.Description,
                 Producer = _.Producer,
                 Year = _.Year,
-                //TODO: poster url
+                Author = _.User.UserName,
+                PosterUrl = _.Poster.Path
             }).ToList();
             
             return films;
         }
 
-        public async Task<object> GetById(int id)
+        public async Task<FilmViewDetailModel> GetById(int id, string userName)
         {
-            var film = await _dbContext.Films.FindAsync(id);
+            var dbFilm = await _dbContext.Films.FindAsync(id);
+            
+            var film = new FilmViewDetailModel
+            {
+                    Id = dbFilm.Id,
+                    Name = dbFilm.Name,
+                    Description = dbFilm.Description,
+                    Producer = dbFilm.Producer,
+                    Year = dbFilm.Year,
+                    Author = dbFilm.User.UserName,
+                    PosterUrl = dbFilm.Poster.Path,
+                    CanEdit = userName == dbFilm.User.UserName
+            }; 
 
             return film;
         }
