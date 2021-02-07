@@ -10,5 +10,6 @@ namespace FilmCatalogCore.Services.Films
         Task<object> GetById(int id);
         Task<object> EditFilm(FilmEditModel model);
         Task<object> Delete(int id);
+        Task Create(FilmCreateModel film);
     }
 }

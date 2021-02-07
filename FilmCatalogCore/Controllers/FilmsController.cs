@@ -1,22 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
+using FilmCatalogCore.Data;
+using FilmCatalogCore.Data.Entities;
+using FilmCatalogCore.Models;
+using FilmCatalogCore.Services.Films;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using FilmCatalogCore.Data;
-using FilmCatalogCore.Data.Entities;
 
-namespace FilmCatalogCore
+namespace FilmCatalogCore.Controllers
 {
     public class FilmsController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly IFilmService _filmService;
 
-        public FilmsController(ApplicationDbContext context)
+        public FilmsController(ApplicationDbContext context, IFilmService filmService)
         {
             _context = context;
+            _filmService = filmService;
         }
 
         // GET: Films
@@ -49,8 +51,6 @@ namespace FilmCatalogCore
         // GET: Films/Create
         public IActionResult Create()
         {
-            ViewData["PosterId"] = new SelectList(_context.Posters, "Id", "Id");
-            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id");
             return View();
         }
 
@@ -59,16 +59,13 @@ namespace FilmCatalogCore
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Name,Description,Producer,Year,PosterId,UserId,Id")] Film film)
+        public async Task<IActionResult> Create([Bind("Name,Description,Producer,Year,Id")] FilmCreateModel film)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(film);
-                await _context.SaveChangesAsync();
+                _filmService.Create(film);
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["PosterId"] = new SelectList(_context.Posters, "Id", "Id", film.PosterId);
-            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", film.UserId);
             return View(film);
         }
 

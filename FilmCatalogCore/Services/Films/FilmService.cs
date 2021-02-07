@@ -4,7 +4,9 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using FilmCatalogCore.Data;
+using FilmCatalogCore.Data.Entities;
 using FilmCatalogCore.Models;
+using FilmCatalogCore.Services.Posters;
 using Microsoft.EntityFrameworkCore;
 
 namespace FilmCatalogCore.Services.Films
@@ -12,10 +14,12 @@ namespace FilmCatalogCore.Services.Films
     public class FilmService : IFilmService
     {
         private readonly ApplicationDbContext _dbContext;
+        private readonly IPosterService _posterService;
 
-        public FilmService(ApplicationDbContext dbContext)
+        public FilmService(ApplicationDbContext dbContext, IPosterService posterService)
         {
             _dbContext = dbContext;
+            _posterService = posterService;
         }
         
         //TODO: filters
@@ -72,6 +76,22 @@ namespace FilmCatalogCore.Services.Films
         public Task<object> Delete(int id)
         {
             throw new System.NotImplementedException();
+        }
+
+        public async Task Create(FilmCreateModel film)
+        {
+            var poster = await _posterService.AddPoster(film.Image);
+            
+            var newFilm = new Film
+            {
+                Description = film.Description,
+                Name = film.Name,
+                Year = film.Year,
+                Producer = film.Producer,
+            };
+            _dbContext.Add(newFilm);
+            
+            await _dbContext.SaveChangesAsync();
         }
     }
 }
