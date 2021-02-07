@@ -7,6 +7,8 @@ using FilmCatalogCore.Data;
 using FilmCatalogCore.Data.Entities;
 using FilmCatalogCore.Models;
 using FilmCatalogCore.Services.Posters;
+using JetBrains.Annotations;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace FilmCatalogCore.Services.Films
@@ -15,11 +17,13 @@ namespace FilmCatalogCore.Services.Films
     {
         private readonly ApplicationDbContext _dbContext;
         private readonly IPosterService _posterService;
+        private readonly UserManager<User> _userManager;
 
-        public FilmService(ApplicationDbContext dbContext, IPosterService posterService)
+        public FilmService(ApplicationDbContext dbContext, IPosterService posterService, UserManager<User> userManager)
         {
             _dbContext = dbContext;
             _posterService = posterService;
+            _userManager = userManager;
         }
         
         //TODO: filters
@@ -78,8 +82,10 @@ namespace FilmCatalogCore.Services.Films
             throw new System.NotImplementedException();
         }
 
-        public async Task Create(FilmCreateModel film)
+        public async Task Create(FilmCreateModel film, string userName)
         {
+            var user = _userManager.Users.First(_ => _.UserName == userName);
+            
             var poster = await _posterService.AddPoster(film.Image);
             
             var newFilm = new Film
@@ -88,6 +94,8 @@ namespace FilmCatalogCore.Services.Films
                 Name = film.Name,
                 Year = film.Year,
                 Producer = film.Producer,
+                User = user,
+                Poster = poster
             };
             _dbContext.Add(newFilm);
             

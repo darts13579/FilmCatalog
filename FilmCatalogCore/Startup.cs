@@ -1,6 +1,7 @@
 using FilmCatalogCore.Data;
 using FilmCatalogCore.Data.Entities;
 using FilmCatalogCore.Services.Films;
+using FilmCatalogCore.Services.Posters;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -40,6 +41,7 @@ namespace FilmCatalogCore
             services.AddRazorPages();
 
             services.AddScoped<IFilmService, FilmService>();
+            services.AddScoped<IPosterService, PosterService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -4,12 +4,14 @@ using FilmCatalogCore.Data;
 using FilmCatalogCore.Data.Entities;
 using FilmCatalogCore.Models;
 using FilmCatalogCore.Services.Films;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
 namespace FilmCatalogCore.Controllers
 {
+    [Authorize]
     public class FilmsController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -22,6 +24,7 @@ namespace FilmCatalogCore.Controllers
         }
 
         // GET: Films
+        [AllowAnonymous]
         public async Task<IActionResult> Index()
         {
             var applicationDbContext = _context.Films.Include(f => f.Poster).Include(f => f.User);
@@ -59,13 +62,17 @@ namespace FilmCatalogCore.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Name,Description,Producer,Year,Id")] FilmCreateModel film)
+        public async Task<IActionResult> Create([Bind("Name,Description,Producer,Year,Id")]
+            FilmCreateModel film)
         {
-            if (ModelState.IsValid)
+            if (ModelState.IsValid && User.Identity.IsAuthenticated)
             {
-                _filmService.Create(film);
+                var userName = User.Identity.Name;
+
+                await _filmService.Create(film, userName);
                 return RedirectToAction(nameof(Index));
             }
+
             return View(film);
         }
 
@@ -82,6 +89,7 @@ namespace FilmCatalogCore.Controllers
             {
                 return NotFound();
             }
+
             ViewData["PosterId"] = new SelectList(_context.Posters, "Id", "Id", film.PosterId);
             ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", film.UserId);
             return View(film);
@@ -92,7 +100,8 @@ namespace FilmCatalogCore.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Name,Description,Producer,Year,PosterId,UserId,Id")] Film film)
+        public async Task<IActionResult> Edit(int id, [Bind("Name,Description,Producer,Year,PosterId,UserId,Id")]
+            Film film)
         {
             if (id != film.Id)
             {
@@ -117,8 +126,10 @@ namespace FilmCatalogCore.Controllers
                         throw;
                     }
                 }
+
                 return RedirectToAction(nameof(Index));
             }
+
             ViewData["PosterId"] = new SelectList(_context.Posters, "Id", "Id", film.PosterId);
             ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", film.UserId);
             return View(film);
