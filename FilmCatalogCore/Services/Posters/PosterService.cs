@@ -48,5 +48,22 @@ namespace FilmCatalogCore.Services.Posters
                 throw;
             }
         }
+        
+        public async Task RemovePoster(Poster poster)
+        {
+            try
+            {
+                File.Delete(poster.Path);
+                
+                _dbContext.Posters.Remove(poster);
+
+                await _dbContext.SaveChangesAsync();
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine($"Failed to delete image, stack: {e}");
+                throw;
+            }
+        }
     }
 }

@@ -115,13 +115,19 @@ namespace FilmCatalogCore.Services.Films
         }
 
         /*TODO: return type*/
-        public async Task<object> Delete(int id)
+        public async Task Delete(int id)
         {
             var userId = _httpContextAccessor.HttpContext.User.GetLoggedInUserId<string>();
             var dbFilm = await _dbContext.Films.FindAsync(id);
             if (userId != dbFilm.UserId)
-                return null;
-            return null;
+                return;
+
+            _dbContext.Films.Remove(dbFilm);
+            
+            
+            await _dbContext.SaveChangesAsync();
+            
+            return;
         }
 
         public async Task Create(FilmCreateModel film)

@@ -35,6 +35,7 @@ namespace FilmCatalogCore.Controllers
         }
 
         // GET: Films/Details/5
+        [AllowAnonymous]
         public async Task<IActionResult> Details(int? id)
         {
             if (id != null && UserName != null)
@@ -120,10 +121,7 @@ namespace FilmCatalogCore.Controllers
                 return NotFound();
             }
 
-            var film = await _context.Films
-                .Include(f => f.Poster)
-                .Include(f => f.User)
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var film = await _filmService.GetById((int) id);
             if (film == null)
             {
                 return NotFound();
@@ -137,9 +135,8 @@ namespace FilmCatalogCore.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var film = await _context.Films.FindAsync(id);
-            _context.Films.Remove(film);
-            await _context.SaveChangesAsync();
+            await _filmService.Delete(id);
+            
             return RedirectToAction(nameof(Index));
         }
 

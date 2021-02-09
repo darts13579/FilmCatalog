@@ -7,5 +7,7 @@ namespace FilmCatalogCore.Services.Posters
     public interface IPosterService
     {
         Task<Poster> AddPoster(IFormFile file);
+
+        Task RemovePoster(Poster poster);
     }
 }
