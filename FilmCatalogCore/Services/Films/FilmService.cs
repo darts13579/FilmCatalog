@@ -22,47 +22,60 @@ namespace FilmCatalogCore.Services.Films
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly UserManager<User> _userManager;
 
-        public FilmService(ApplicationDbContext dbContext, IPosterService posterService, IHttpContextAccessor httpContextAccessor, UserManager<User> userManager)
+        private const int PageSize = 5;
+
+        public FilmService(ApplicationDbContext dbContext, IPosterService posterService,
+            IHttpContextAccessor httpContextAccessor, UserManager<User> userManager)
         {
             _dbContext = dbContext;
             _posterService = posterService;
             _httpContextAccessor = httpContextAccessor;
             _userManager = userManager;
         }
-        
-        //TODO: filters
-        public async Task<List<FilmViewModel>> GetFilmList()
+
+        public async Task<IndexViewModel> GetFilmList(int page)
         {
-            var films = _dbContext.Films.ToList().Select(_ => new FilmViewModel
-            {
-                Id = _.Id,
-                Name = _.Name,
-                Description = _.Description,
-                Producer = _.Producer,
-                Year = _.Year,
-                Author = _.User.UserName,
-                PosterUrl = _.Poster.Path
-            }).ToList();
+            var filmsCount = _dbContext.Films.Count();
             
-            return films;
+            var films = await _dbContext.Films
+                .Skip((page - 1) * PageSize)
+                .Take(PageSize)
+                .Select(_ => new FilmViewModel
+                {
+                    Id = _.Id,
+                    Name = _.Name,
+                    Description = _.Description,
+                    Producer = _.Producer,
+                    Year = _.Year,
+                    Author = _.User.UserName,
+                    PosterUrl = _.Poster.Path
+                }).ToListAsync();
+
+            var viewModel = new IndexViewModel
+            {
+                Films = films,
+                Pagination = new PaginationModel(filmsCount, page, PageSize)
+            };
+
+            return viewModel;
         }
 
         public async Task<FilmViewDetailModel> GetById(int id)
         {
             var userName = _httpContextAccessor.HttpContext.User.GetLoggedInUserName();
             var dbFilm = await _dbContext.Films.FindAsync(id);
-            
+
             var film = new FilmViewDetailModel
             {
-                    Id = dbFilm.Id,
-                    Name = dbFilm.Name,
-                    Description = dbFilm.Description,
-                    Producer = dbFilm.Producer,
-                    Year = dbFilm.Year,
-                    Author = dbFilm.User.UserName,
-                    PosterUrl = dbFilm.Poster.Path,
-                    CanEdit = userName == dbFilm.User.UserName
-            }; 
+                Id = dbFilm.Id,
+                Name = dbFilm.Name,
+                Description = dbFilm.Description,
+                Producer = dbFilm.Producer,
+                Year = dbFilm.Year,
+                Author = dbFilm.User.UserName,
+                PosterUrl = dbFilm.Poster.Path,
+                CanEdit = userName == dbFilm.User.UserName
+            };
 
             return film;
         }
@@ -73,7 +86,7 @@ namespace FilmCatalogCore.Services.Films
             var dbFilm = await _dbContext.Films.FindAsync(id);
             if (userId != dbFilm.UserId)
                 return null;
-            
+
             var film = new FilmEditModel
             {
                 Id = dbFilm.Id,
@@ -81,7 +94,7 @@ namespace FilmCatalogCore.Services.Films
                 Description = dbFilm.Description,
                 Producer = dbFilm.Producer,
                 Year = dbFilm.Year,
-            }; 
+            };
 
             return film;
         }
@@ -111,44 +124,56 @@ namespace FilmCatalogCore.Services.Films
                 Debug.WriteLine($"Failed to edit item. Error stack: {e}");
                 throw;
             }
-            
         }
 
-        /*TODO: return type*/
         public async Task Delete(int id)
         {
-            var userId = _httpContextAccessor.HttpContext.User.GetLoggedInUserId<string>();
-            var dbFilm = await _dbContext.Films.FindAsync(id);
-            if (userId != dbFilm.UserId)
-                return;
+            try
+            {
+                var userId = _httpContextAccessor.HttpContext.User.GetLoggedInUserId<string>();
+                var dbFilm = await _dbContext.Films.FindAsync(id);
+                if (userId != dbFilm.UserId)
+                    return;
 
-            _dbContext.Films.Remove(dbFilm);
-            
-            
-            await _dbContext.SaveChangesAsync();
-            
-            return;
+                _dbContext.Films.Remove(dbFilm);
+
+
+                await _dbContext.SaveChangesAsync();
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e);
+                throw;
+            }
         }
 
         public async Task Create(FilmCreateModel film)
         {
-            var userId = _httpContextAccessor.HttpContext.User.GetLoggedInUserId<string>();
-            var user = _userManager.Users.First(_ => _.Id == userId);
-            
-            var poster = await _posterService.AddPoster(film.Image);
-            
-            var newFilm = new Film
+            try
             {
-                Description = film.Description,
-                Name = film.Name,
-                Year = film.Year,
-                Producer = film.Producer,
-                User = user,
-                Poster = poster
-            };
-            _dbContext.Add(newFilm);
-            
-            await _dbContext.SaveChangesAsync();
+                var userId = _httpContextAccessor.HttpContext.User.GetLoggedInUserId<string>();
+                var user = _userManager.Users.First(_ => _.Id == userId);
+
+                var poster = await _posterService.AddPoster(film.Image);
+
+                var newFilm = new Film
+                {
+                    Description = film.Description,
+                    Name = film.Name,
+                    Year = film.Year,
+                    Producer = film.Producer,
+                    User = user,
+                    Poster = poster
+                };
+                _dbContext.Add(newFilm);
+
+                await _dbContext.SaveChangesAsync();
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e);
+                throw;
+            }
         }
     }
 }

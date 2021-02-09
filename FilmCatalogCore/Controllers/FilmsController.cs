@@ -26,11 +26,10 @@ namespace FilmCatalogCore.Controllers
 
         // GET: Films
         [AllowAnonymous]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page = 1)
         {
-            var films = await _filmService.GetFilmList();
+            var films = await _filmService.GetFilmList(page);
             
-            //var applicationDbContext = _context.Films.Include(f => f.Poster).Include(f => f.User);
             return View(films);
         }
 
@@ -138,11 +137,6 @@ namespace FilmCatalogCore.Controllers
             await _filmService.Delete(id);
             
             return RedirectToAction(nameof(Index));
-        }
-
-        private bool FilmExists(int id)
-        {
-            return _context.Films.Any(e => e.Id == id);
         }
     }
 }

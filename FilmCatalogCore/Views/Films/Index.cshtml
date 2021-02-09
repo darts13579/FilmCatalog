@@ -1,4 +1,4 @@
-﻿@model IEnumerable<FilmViewModel>
+﻿@model IndexViewModel
 
 @{
     ViewData["Title"] = "Фильмы";
@@ -12,7 +12,7 @@
 
 <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 align-content-between g-3">
     @{
-        foreach (var film in Model)
+        foreach (var film in Model.Films)
         {
             <div class="col-3 card shadow-sm mx-1 my-1">
                 <img src="@film.PosterUrl" alt="@film.Name" class="bd-placeholder-img card-img-top p-1" width="100%" height="225" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Thumbnail"/>
@@ -39,4 +39,25 @@
             </div>
         }
     }
+    
+    
 </div>
+
+@if (Model.Pagination.HasPreviousPage)
+{
+    <a asp-action="Index"
+       asp-route-page="@(Model.Pagination.PageNumber - 1)"
+       class="btn btn-outline-dark">
+        <i class="glyphicon glyphicon-chevron-left"></i>
+        Назад
+    </a>
+}
+@if (Model.Pagination.HasNextPage)
+{
+    <a asp-action="Index"
+       asp-route-page="@(Model.Pagination.PageNumber + 1)"
+       class="btn btn-outline-dark">
+        Вперед
+        <i class="glyphicon glyphicon-chevron-right"></i>
+    </a>
+}

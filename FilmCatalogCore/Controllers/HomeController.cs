@@ -16,7 +16,7 @@ namespace FilmCatalogCore.Controllers
 
         public IActionResult Index()
         {
-            return View();
+            return RedirectToAction("Index", "Films");
         }
 
         public IActionResult Privacy()
