@@ -39,7 +39,7 @@ namespace FilmCatalogCore.Controllers
         {
             if (id != null && UserName != null)
             {
-                var film = await _filmService.GetById((int) id, UserName);
+                var film = await _filmService.GetById((int) id);
                 if (film == null)
                 {
                     return NotFound();
@@ -66,9 +66,7 @@ namespace FilmCatalogCore.Controllers
         {
             if (ModelState.IsValid && UserName != null)
             {
-                var userName = User.Identity.Name;
-
-                await _filmService.Create(film, userName);
+                await _filmService.Create(film);
                 return RedirectToAction(nameof(Index));
             }
 
@@ -83,14 +81,12 @@ namespace FilmCatalogCore.Controllers
                 return NotFound();
             }
 
-            var film = await _context.Films.FindAsync(id);
+            var film = _filmService.GetEditFilm((int) id);
             if (film == null)
             {
                 return NotFound();
             }
-
-            ViewData["PosterId"] = new SelectList(_context.Posters, "Id", "Id", film.PosterId);
-            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", film.UserId);
+            
             return View(film);
         }
 
@@ -99,8 +95,7 @@ namespace FilmCatalogCore.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Name,Description,Producer,Year,PosterId,UserId,Id")]
-            Film film)
+        public async Task<IActionResult> Edit(int id, FilmEditModel film)
         {
             if (id != film.Id)
             {
@@ -109,28 +104,11 @@ namespace FilmCatalogCore.Controllers
 
             if (ModelState.IsValid)
             {
-                try
-                {
-                    _context.Update(film);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!FilmExists(film.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
+                _filmService.EditFilm(film);
 
                 return RedirectToAction(nameof(Index));
             }
-
-            ViewData["PosterId"] = new SelectList(_context.Posters, "Id", "Id", film.PosterId);
-            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", film.UserId);
+            
             return View(film);
         }
 

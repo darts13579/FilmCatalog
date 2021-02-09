@@ -8,9 +8,10 @@ namespace FilmCatalogCore.Services.Films
     public interface IFilmService
     {
         Task<List<FilmViewModel>> GetFilmList();
-        Task<FilmViewDetailModel> GetById(int id, string userName);
+        Task<FilmViewDetailModel> GetById(int id);
         Task<object> EditFilm(FilmEditModel model);
         Task<object> Delete(int id);
-        Task Create(FilmCreateModel film, [CanBeNull] string userName);
+        Task Create(FilmCreateModel film);
+        FilmEditModel GetEditFilm(int id);
     }
 }

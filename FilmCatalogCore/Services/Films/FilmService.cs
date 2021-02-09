@@ -5,9 +5,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using FilmCatalogCore.Data;
 using FilmCatalogCore.Data.Entities;
+using FilmCatalogCore.Extensions;
 using FilmCatalogCore.Models;
 using FilmCatalogCore.Services.Posters;
 using JetBrains.Annotations;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,12 +19,14 @@ namespace FilmCatalogCore.Services.Films
     {
         private readonly ApplicationDbContext _dbContext;
         private readonly IPosterService _posterService;
+        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly UserManager<User> _userManager;
 
-        public FilmService(ApplicationDbContext dbContext, IPosterService posterService, UserManager<User> userManager)
+        public FilmService(ApplicationDbContext dbContext, IPosterService posterService, IHttpContextAccessor httpContextAccessor, UserManager<User> userManager)
         {
             _dbContext = dbContext;
             _posterService = posterService;
+            _httpContextAccessor = httpContextAccessor;
             _userManager = userManager;
         }
         
@@ -43,8 +47,9 @@ namespace FilmCatalogCore.Services.Films
             return films;
         }
 
-        public async Task<FilmViewDetailModel> GetById(int id, string userName)
+        public async Task<FilmViewDetailModel> GetById(int id)
         {
+            var userName = _httpContextAccessor.HttpContext.User.GetLoggedInUserName();
             var dbFilm = await _dbContext.Films.FindAsync(id);
             
             var film = new FilmViewDetailModel
@@ -95,9 +100,10 @@ namespace FilmCatalogCore.Services.Films
             throw new System.NotImplementedException();
         }
 
-        public async Task Create(FilmCreateModel film, string userName)
+        public async Task Create(FilmCreateModel film)
         {
-            var user = _userManager.Users.First(_ => _.UserName == userName);
+            var userId = _httpContextAccessor.HttpContext.User.GetLoggedInUserId<string>();
+            var user = _userManager.Users.First(_ => _.Id == userId);
             
             var poster = await _posterService.AddPoster(film.Image);
             
@@ -113,6 +119,11 @@ namespace FilmCatalogCore.Services.Films
             _dbContext.Add(newFilm);
             
             await _dbContext.SaveChangesAsync();
+        }
+
+        public FilmEditModel GetEditFilm(int id)
+        {
+            throw new NotImplementedException();
         }
     }
 }
