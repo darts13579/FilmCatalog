@@ -39,6 +39,8 @@ namespace FilmCatalogCore
                 .AddEntityFrameworkStores<ApplicationDbContext>();
             services.AddControllersWithViews().AddRazorRuntimeCompilation();
             services.AddRazorPages();
+            
+            services.AddHttpContextAccessor();
 
             services.AddScoped<IFilmService, FilmService>();
             services.AddScoped<IPosterService, PosterService>();

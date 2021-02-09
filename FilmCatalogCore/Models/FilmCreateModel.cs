@@ -1,12 +1,10 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Http;
 
 namespace FilmCatalogCore.Models
 {
     public class FilmCreateModel
-    {
+    {        
         [Required (ErrorMessage = "Не указано название фильма")]
         [StringLength(40, ErrorMessage = "Длина названия должна быть до 40 символов")]
         public string Name { get; set; }
@@ -22,6 +20,7 @@ namespace FilmCatalogCore.Models
         [Range(1895, 2021, ErrorMessage = "Недопустимый год выпуска фильма")]
         public int Year { get; set; }
 
+        [Required]
         public IFormFile Image { get; set; }
     }
 }

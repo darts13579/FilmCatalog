@@ -67,7 +67,26 @@ namespace FilmCatalogCore.Services.Films
             return film;
         }
 
-        public async Task<object> EditFilm(FilmEditModel model)
+        public async Task<FilmEditModel> GetEditFilm(int id)
+        {
+            var userId = _httpContextAccessor.HttpContext.User.GetLoggedInUserId<string>();
+            var dbFilm = await _dbContext.Films.FindAsync(id);
+            if (userId != dbFilm.UserId)
+                return null;
+            
+            var film = new FilmEditModel
+            {
+                Id = dbFilm.Id,
+                Name = dbFilm.Name,
+                Description = dbFilm.Description,
+                Producer = dbFilm.Producer,
+                Year = dbFilm.Year,
+            }; 
+
+            return film;
+        }
+
+        public async Task<FilmEditModel> EditFilm(FilmEditModel model)
         {
             var film = await _dbContext.Films.FindAsync(model.Id);
 
@@ -95,9 +114,14 @@ namespace FilmCatalogCore.Services.Films
             
         }
 
-        public Task<object> Delete(int id)
+        /*TODO: return type*/
+        public async Task<object> Delete(int id)
         {
-            throw new System.NotImplementedException();
+            var userId = _httpContextAccessor.HttpContext.User.GetLoggedInUserId<string>();
+            var dbFilm = await _dbContext.Films.FindAsync(id);
+            if (userId != dbFilm.UserId)
+                return null;
+            return null;
         }
 
         public async Task Create(FilmCreateModel film)
@@ -119,11 +143,6 @@ namespace FilmCatalogCore.Services.Films
             _dbContext.Add(newFilm);
             
             await _dbContext.SaveChangesAsync();
-        }
-
-        public FilmEditModel GetEditFilm(int id)
-        {
-            throw new NotImplementedException();
         }
     }
 }

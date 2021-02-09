@@ -1,4 +1,4 @@
-﻿@model FilmCatalogCore.Data.Entities.Film
+﻿@model FilmEditModel
 
 @{
     ViewData["Title"] = "Edit";
@@ -31,16 +31,6 @@
                 <label asp-for="Year" class="control-label"></label>
                 <input asp-for="Year" class="form-control" />
                 <span asp-validation-for="Year" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="PosterId" class="control-label"></label>
-                <select asp-for="PosterId" class="form-control" asp-items="ViewBag.PosterId"></select>
-                <span asp-validation-for="PosterId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="UserId" class="control-label"></label>
-                <select asp-for="UserId" class="form-control" asp-items="ViewBag.UserId"></select>
-                <span asp-validation-for="UserId" class="text-danger"></span>
             </div>
             <input type="hidden" asp-for="Id" />
             <div class="form-group">

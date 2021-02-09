@@ -81,7 +81,7 @@ namespace FilmCatalogCore.Controllers
                 return NotFound();
             }
 
-            var film = _filmService.GetEditFilm((int) id);
+            var film = await _filmService.GetEditFilm((int) id);
             if (film == null)
             {
                 return NotFound();
@@ -104,7 +104,7 @@ namespace FilmCatalogCore.Controllers
 
             if (ModelState.IsValid)
             {
-                _filmService.EditFilm(film);
+                await _filmService.EditFilm(film);
 
                 return RedirectToAction(nameof(Index));
             }
